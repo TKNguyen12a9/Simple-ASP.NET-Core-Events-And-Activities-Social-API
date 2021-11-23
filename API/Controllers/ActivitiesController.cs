@@ -5,13 +5,10 @@ using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Persistence;
 
 
 namespace API.Controllers
 {
-	// [ApiController]
-	// [Route("api/[controller]")]
 	public class ActivitiesController : BaseApiController
 	{
 		private readonly IMediator _mediator;
