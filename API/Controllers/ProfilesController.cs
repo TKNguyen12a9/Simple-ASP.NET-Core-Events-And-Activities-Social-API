@@ -20,8 +20,6 @@ namespace API.Controllers
 			return HandleResult(await Mediator.Send(new ListActivityProfile.Query { Username = username, Predicate = predicate }));
 		}
 
-		// todo: read more about policy based authorization
-		// [Authorize(Policy = "IsProfileOwner")]
 		[HttpPut]
 		public async Task<IActionResult> Edit(EditProfile.Command command)
 		{
