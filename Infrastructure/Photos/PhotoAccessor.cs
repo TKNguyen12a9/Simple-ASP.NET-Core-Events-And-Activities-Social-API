@@ -28,13 +28,7 @@ namespace Infrastructure.Photos
             _env = env;
             _cloudinary = new Cloudinary(account);
         }
-
-        // private bool CheckFileExists(IFormFile file)
-        // {
-        //     var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-        //     return (extension == ".jpg" || extension == ".png"); // Change the extension based on your need
-        // }
-
+      
         public async Task<PhotoUploadResults> AddPhoto([FromForm(Name = "File")] IFormFile File)
         {
             if (File?.Length > 0)

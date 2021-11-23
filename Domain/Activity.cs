@@ -7,7 +7,7 @@ namespace Domain
     public class Activity
     {
         public Guid Id { get; set; }
-        // [Required] //  field is required means not allowing null, but your database do allowed null!
+        // [Required] //  field is required means not allowing null, but your database do allow null!
         // so when do query, you will possibly got the error: https://forums.asp.net/t/2167761.aspx?An+exception+occurred+while+iterating+over+the+results+of+a+query+for+context+type+Invalid+operation+The+connection+is+closed+
         [Required]
         public string Title { get; set; }

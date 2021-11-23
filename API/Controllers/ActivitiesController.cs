@@ -1,14 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using Application.Activities;
 using Domain;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
-using MediatR;
-using Application.Activities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using Application.Core;
-using System.Runtime.CompilerServices;
+
 
 namespace API.Controllers
 {

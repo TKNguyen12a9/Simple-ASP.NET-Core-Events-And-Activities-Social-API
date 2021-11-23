@@ -1,100 +1,102 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using API.Extensions;
+using API.Middleware;
+using API.SignalR;
+using Application.Activities;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using Persistence;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
-using Application.Activities;
-using Application.Core;
-using API.Extensions;
-using FluentValidation.AspNetCore;
-using API.Middleware;
-using Microsoft.AspNetCore.Authorization;
-using System.Net;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using Microsoft.AspNetCore.SignalR;
-using API.SignalR;
 
 namespace API
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+	public class Startup
+	{
+		public Startup(IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // 
-            services.AddControllers(opt =>
-            {
-                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                opt.Filters.Add(new AuthorizeFilter(policy));
-            });
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			// 
+			services.AddControllers(opt =>
+			{
+				var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+				opt.Filters.Add(new AuthorizeFilter(policy));
+			});
 
-            // config validator
-            services.AddControllers().AddFluentValidation(config =>
-            {
-                config.RegisterValidatorsFromAssemblyContaining<Create>();
-            });
+			// config validator
+			services.AddControllers().AddFluentValidation(config =>
+			{
+				config.RegisterValidatorsFromAssemblyContaining<Create>();
+			});
 
-            // startup class houseKeeping! 
-            // all services config bellow has been moved to AddAppServices file
-            services.AddAppServices(Configuration);
-            // add custom Identity Services config
-            services.AddIdentityService(Configuration);
-        }
+			// startup class houseKeeping! 
+			// all services config bellow has been moved to AddAppServices file
+			services.AddAppServices(Configuration);
+			// add custom Identity Services config
+			services.AddIdentityService(Configuration);
+		}
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // use custom exception middleware
-            app.UseMiddleware<ExceptionMiddleware>();
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			// use custom exception middleware
+			app.UseMiddleware<ExceptionMiddleware>();
 
-            // in the production this will not be reached! 
-            // so to handle exception, need to create exception middleware!
-            if (env.IsDevelopment())
-            {
-                //  app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
-            }
+			// add security headers for production mode
+			// app.UseXContentTypeOptions();
+			// app.UseReferrerPolicy(opt => opt.NoReferrer());
+			// app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
+			// app.UseXfo(opt => opt.Deny());
+			// app.UseCspReportOnly(opt =>
+			// {
+			// 	opt.BlockAllMixedContent()
+			// 	.StyleSources(s => s.Self())
+			// 	.FontSources(s => s.Self())
+			// 	.FormActions(s => s.Self())
+			// 	.FrameAncestors(s => s.Self())
+			// 	.ImageSources(s => s.Self())
+			// 	.ScriptSources(s => s.Self());
+			// });
 
-            // app.UseHttpsRedirection(); // comment this for API project
-            app.UseStaticFiles();
-            // app.UseStaticFiles(new StaticFileOptions()
-            // {
-            //     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"StaticFiles")),
-            //     RequestPath = new PathString("/StaticFiles")
-            // });
+			// in the production this will not be reached! 
+			// so to handle exception, need to create exception middleware!
+			if (env.IsDevelopment())
+			{
+				//  app.UseDeveloperExceptionPage();
+				app.UseSwagger();
+				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+			}
 
-            app.UseRouting();
+			// app.UseHttpsRedirection(); // comment this for API project
+			app.UseStaticFiles(new StaticFileOptions
+			{
+				FileProvider = env.WebRootFileProvider
+			});
 
-            // configure CORs 2: use Cors
-            app.UseCors("CorsPolicy");
+			app.UseRouting();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+			// configure CORs 2: use Cors
+			app.UseCors("CorsPolicy");
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                // config signalR 2 
-                endpoints.MapHub<ChatHub>("/chat");
-            });
-        }
-    }
+			app.UseAuthentication();
+			app.UseAuthorization();
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+				// config signalR 2 
+				endpoints.MapHub<ChatHub>("/chat");
+				endpoints.MapFallbackToController("Index", "Fallback");
+			});
+		}
+	}
 }

@@ -54,15 +54,16 @@ namespace Application.Activities
 						new { currentUsername = _userAccessor.GetUserName() })
 					.AsQueryable();
 
-				// isGoing filter
-				if (request.Params.IsGoging && !request.Params.IsHosting)
+				// isGoing only filter
+				if (request.Params.IsGoing && !request.Params.IsHosting)
 				{
-					var newQuery = query.Where(x => x.Attendees.Any(y => y.Username == _userAccessor.GetUserName()));
+					var newQuery = query.Where(x => x.Attendees.Any(y => y.Username == _userAccessor.GetUserName())
+						&& x.HostUsername != _userAccessor.GetUserName());
 					query = newQuery;
 				}
 
-				// isHost filter
-				if (request.Params.IsHosting && !request.Params.IsGoging)
+				// isHosting only filter
+				if (request.Params.IsHosting && !request.Params.IsGoing)
 				{
 					query = query.Where(x => x.HostUsername == _userAccessor.GetUserName());
 				}

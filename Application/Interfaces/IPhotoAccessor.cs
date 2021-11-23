@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interfaces
 {
-    public interface IPhotoAccessor
-    {
-        Task<PhotoUploadResults> AddPhoto([FromForm(Name = "File")] IFormFile File);
+	public interface IPhotoAccessor
+	{
+		Task<PhotoUploadResults> AddPhoto([FromForm(Name = "File")] IFormFile File);
 
-        Task<string> DeletePhoto(string publicId);
-
-    }
+		Task<string> DeletePhoto(string publicId);
+	}
 }

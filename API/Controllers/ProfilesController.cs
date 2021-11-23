@@ -6,21 +6,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class ProfilesController : BaseApiController
-    {
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetUserProfile(string username)
-        {
-            return HandleResult(await Mediator.Send(new ProfileDetails.Query { Username = username }));
-        }
+	public class ProfilesController : BaseApiController
+	{
+		[HttpGet("{username}")]
+		public async Task<IActionResult> GetUserProfile(string username)
+		{
+			return HandleResult(await Mediator.Send(new ProfileDetails.Query { Username = username }));
+		}
 
-        // todo: read more about policy based authorization
-        // [Authorize(Policy = "IsProfileOwner")]
-        [HttpPut]
-        public async Task<IActionResult> Edit(EditProfile.Command command)
-        {
-            return HandleResult(await Mediator.Send(command));
-        }
+		[HttpGet("{username}/activities")]
+		public async Task<IActionResult> GetProfileActivities(string username, string predicate)
+		{
+			return HandleResult(await Mediator.Send(new ListActivityProfile.Query { Username = username, Predicate = predicate }));
+		}
 
-    }
+		// todo: read more about policy based authorization
+		// [Authorize(Policy = "IsProfileOwner")]
+		[HttpPut]
+		public async Task<IActionResult> Edit(EditProfile.Command command)
+		{
+			return HandleResult(await Mediator.Send(command));
+		}
+
+	}
 }

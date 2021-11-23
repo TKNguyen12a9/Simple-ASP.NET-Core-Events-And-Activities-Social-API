@@ -21,6 +21,7 @@ namespace API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly TokenService _tokenService;
+
         public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             TokenService tokenService)
@@ -28,12 +29,6 @@ namespace API.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
-        }
-
-        [HttpGet("{index}")]
-        public ActionResult<string> Index()
-        {
-            return "this is test endpoint";
         }
 
         [HttpPost("login")] // endpoint need to go with {} 
@@ -69,8 +64,6 @@ namespace API.Controllers
 
             if (await _userManager.Users.AnyAsync(x => x.UserName == registerDTO.UserName))
             {
-                // return BadRequest("Username is already taken.");
-
                 ModelState.AddModelError("username", "Username already taken.");
                 return ValidationProblem(ModelState);
             }
