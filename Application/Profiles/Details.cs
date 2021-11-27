@@ -12,37 +12,37 @@ using Persistence;
 
 namespace Application.Profiles
 {
-    public class ProfileDetails
-    {
-        public class Query : IRequest<Result<AttendeeProfile>>
-        {
-            public string Username { get; set; }
-        }
+	public class ProfileDetails
+	{
+		public class Query : IRequest<Result<AttendeeProfile>>
+		{
+			public string Username { get; set; }
+		}
 
-        public class Handler : IRequestHandler<Query, Result<AttendeeProfile>>
-        {
-            private readonly AppDbContext _dbContext;
-            private readonly IMapper _mapper;
-            private readonly IUserAccessor _userAccessor;
+		public class Handler : IRequestHandler<Query, Result<AttendeeProfile>>
+		{
+			private readonly AppDbContext _dbContext;
+			private readonly IMapper _mapper;
+			private readonly IUserAccessor _userAccessor;
 
-            public Handler(AppDbContext dbContext, IMapper mapper, IUserAccessor userAccessor)
-            {
-                _dbContext = dbContext;
-                _mapper = mapper;
-                _userAccessor = userAccessor;
-            }
+			public Handler(AppDbContext dbContext, IMapper mapper, IUserAccessor userAccessor)
+			{
+				_dbContext = dbContext;
+				_mapper = mapper;
+				_userAccessor = userAccessor;
+			}
 
-            public async Task<Result<AttendeeProfile>> Handle(Query request, CancellationToken cancellationToken)
-            {
-                var user = await _dbContext.Users
-                    .ProjectTo<AttendeeProfile>(_mapper.ConfigurationProvider,
-                        new { currentUsername = _userAccessor.GetUserName() }) // todo: read more about ProjectTo
-                    .SingleOrDefaultAsync(x => x.Username == request.Username);
+			public async Task<Result<AttendeeProfile>> Handle(Query request, CancellationToken cancellationToken)
+			{
+				var user = await _dbContext.Users
+					.ProjectTo<AttendeeProfile>(_mapper.ConfigurationProvider,
+						new { currentUsername = _userAccessor.GetUserName() })
+					.SingleOrDefaultAsync(x => x.Username == request.Username);
 
-                if (user == null) return null;
+				if (user == null) return null;
 
-                return Result<AttendeeProfile>.Success(user);
-            }
-        }
-    }
+				return Result<AttendeeProfile>.Success(user);
+			}
+		}
+	}
 }

@@ -40,8 +40,7 @@ namespace Application.Profiles
 					.OrderBy(x => x.Activity.Date)
 					.ProjectTo<UserActivityProfileDTO>(_mapper.ConfigurationProvider)
 					.AsQueryable();
-
-				// todo: read more about query like this
+				
 				query = request.Predicate switch
 				{
 					"past" => query.Where(x => x.Date < DateTime.UtcNow),
