@@ -1,16 +1,16 @@
 using System;
-using MediatR;
-using Domain;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Threading;
-using Persistence;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Application.Interfaces;
-using System.Linq;
+using Domain;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Persistence;
 
 namespace Application.Activities
 {
@@ -44,12 +44,10 @@ namespace Application.Activities
 				//  .ThenInclude(y => y.Activity)
 				//  .ToListAsync(cancellationToken);
 
-				// var activitiesToReturn = _mapper.Map<List<ActivityDTO>>(activities);
-
 				// using ProjectTo => optimized and short
 				var query = _context.Activities
-					.Where(x => x.Date >= request.Params.StartDate) // dateTime filter
-					.OrderBy(x => x.Date) // order by date
+					.Where(x => x.Date >= request.Params.StartDate)
+					.OrderBy(x => x.Date)
 					.ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider,
 						new { currentUsername = _userAccessor.GetUserName() })
 					.AsQueryable();
